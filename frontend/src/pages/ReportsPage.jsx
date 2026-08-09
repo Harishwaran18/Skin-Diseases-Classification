@@ -24,9 +24,13 @@ export function ReportsPage() {
   }
 
   const [downloadingId, setDownloadingId] = useState(null)
+  const [success, setSuccess] = useState('')
   const download = async (id) => {
-    setDownloadingId(id); setError('')
-    try { await api.downloadReport(id) }
+    setDownloadingId(id); setError(''); setSuccess('')
+    try {
+      await api.downloadReport(id)
+      setSuccess('PDF downloaded. Check your downloads folder.')
+    }
     catch (err) { setError(err.message) }
     finally { setDownloadingId(null) }
   }
@@ -47,6 +51,7 @@ export function ReportsPage() {
           </label>
         </div>
         <ErrorText>{error}</ErrorText>
+        {success && <div className="success-text">{success}</div>}
         <button className="btn" disabled={generating} onClick={generate}>
           {generating ? 'Generating…' : 'Generate PDF report'}
         </button>
