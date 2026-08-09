@@ -23,6 +23,14 @@ export function ReportsPage() {
     finally { setGenerating(false) }
   }
 
+  const [downloadingId, setDownloadingId] = useState(null)
+  const download = async (id) => {
+    setDownloadingId(id); setError('')
+    try { await api.downloadReport(id) }
+    catch (err) { setError(err.message) }
+    finally { setDownloadingId(null) }
+  }
+
   if (loading) return <Spinner />
 
   return (
@@ -54,7 +62,7 @@ export function ReportsPage() {
                 <tr key={r.id}>
                   <td className="small">{new Date(r.created_at).toLocaleString()}</td>
                   <td className="small">{new Date(r.date_from).toLocaleDateString()} — {new Date(r.date_to).toLocaleDateString()}</td>
-                  <td><a className="btn btn-secondary btn-sm" href={api.reportDownloadUrl(r.id)} target="_blank" rel="noopener">Download PDF</a></td>
+                  <td><button className="btn btn-secondary btn-sm" disabled={downloadingId === r.id} onClick={() => download(r.id)}>{downloadingId === r.id ? 'Downloading…' : 'Download PDF'}</button></td>
                 </tr>
               ))}
             </tbody>
