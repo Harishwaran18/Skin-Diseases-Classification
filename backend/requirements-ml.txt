@@ -1,0 +1,4 @@
+# Optional heavy ML dependencies for the real (torch) inference backend.
+# NOT required to run the app — the default AI_BACKEND=demo works without these.
+torch==2.5.1
+torchvision==0.20.1
