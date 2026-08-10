@@ -23,6 +23,18 @@ export function ReportsPage() {
     finally { setGenerating(false) }
   }
 
+  const [downloadingId, setDownloadingId] = useState(null)
+  const [success, setSuccess] = useState('')
+  const download = async (id) => {
+    setDownloadingId(id); setError(''); setSuccess('')
+    try {
+      await api.downloadReport(id)
+      setSuccess('PDF downloaded. Check your downloads folder.')
+    }
+    catch (err) { setError(err.message) }
+    finally { setDownloadingId(null) }
+  }
+
   if (loading) return <Spinner />
 
   return (
@@ -39,6 +51,7 @@ export function ReportsPage() {
           </label>
         </div>
         <ErrorText>{error}</ErrorText>
+        {success && <div className="success-text">{success}</div>}
         <button className="btn" disabled={generating} onClick={generate}>
           {generating ? 'Generating…' : 'Generate PDF report'}
         </button>
@@ -54,7 +67,7 @@ export function ReportsPage() {
                 <tr key={r.id}>
                   <td className="small">{new Date(r.created_at).toLocaleString()}</td>
                   <td className="small">{new Date(r.date_from).toLocaleDateString()} — {new Date(r.date_to).toLocaleDateString()}</td>
-                  <td><a className="btn btn-secondary btn-sm" href={api.reportDownloadUrl(r.id)} target="_blank" rel="noopener">Download PDF</a></td>
+                  <td><button className="btn btn-secondary btn-sm" disabled={downloadingId === r.id} onClick={() => download(r.id)}>{downloadingId === r.id ? 'Downloading…' : 'Download PDF'}</button></td>
                 </tr>
               ))}
             </tbody>

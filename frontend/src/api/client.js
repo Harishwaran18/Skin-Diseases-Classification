@@ -80,6 +80,22 @@ export const api = {
   generateReport: (data) => request('/reports/generate', { method: 'POST', body: JSON.stringify(data) }),
   listReports: () => request('/reports'),
   reportDownloadUrl: (id) => `${BASE}/reports/${id}/download`,
+  downloadReport: async (id) => {
+    const headers = {}
+    const tok = token()
+    if (tok) headers['Authorization'] = `Bearer ${tok}`
+    const res = await fetch(`${BASE}/reports/${id}/download`, { headers })
+    if (!res.ok) throw new Error('Download failed')
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `skincare-report-${id}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
+  },
 
   // dashboard
   dashboard: () => request('/dashboard'),
